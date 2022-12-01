@@ -1,0 +1,156 @@
+---
+title: "3_ClassificationModels"
+author: "massaine"
+date: "2022-11-30"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+### Accuracy of PT methods
+```{r}
+options(stringsAsFactors=FALSE)
+library(prospectr)
+library(caret)
+library(mlbench)
+library(pROC)
+library(C50)
+library(stringr)
+library(dplyr)
+library(gt)
+```
+
+```{r, eval=FALSE}
+NIR <- "SCIO"
+load(file=here::here("output","dadosSCIO_PT.RData"))
+
+#NIR <- "BUCHI"
+#load(file=here::here("output","dadosBUCHI_PT.RData"))
+```
+
+### test using PLS model
+```{r}
+ctrl <- trainControl(method="repeatedcv",repeats = 5,
+                     summaryFunction=twoClassSummary, 
+                     classProbs=T, savePredictions = T,
+                     verboseIter = FALSE,returnResamp = "all") 
+```
+
+### KNN model to test pre treatment methods
+```{r, eval = F}
+trait <- "Waxy"
+modelFit2 <- list()
+j=1
+for (j in 1:9) {
+  dados <- dados2[[j]]
+  set.seed(2304)
+  modelFit1 <- train(Waxy ~ ., data = dados, method = "knn",trControl = ctrl, 
+                     preProcess = c("center","scale"))
+  modelFit2[[j]] <- modelFit1}
+
+```
+
+### results
+```{r}
+res <- resamples(modelFit2)
+res <- res$values
+resCV_1 <- list()
+
+for(i in 1:9){
+  resCV_1[[i]] <- res[,c(paste(paste("Model",i,sep = ""),"~ROC",sep = ""),
+                         paste(paste("Model",i,sep = ""),"~Sens",sep = ""),
+                         paste(paste("Model",i,sep = ""),"~Spec",sep = ""))]
+  colnames(resCV_1[[i]]) <- c("ROC","Sens","Spec")
+  }
+
+resCV_2 <- do.call(rbind,resCV_1)
+resCV_2$PT <- rep(c(1:9),each=50)
+resCV_2$PT <- as.factor(paste("pt",resCV_2$PT,sep = "_"))
+levels(resCV_2$PT) <- c("raw data", "1st","DT","MSC","SNV","1st + DT",
+                        "1st + MSC","DT + MSC", "1st + SG + DT")
+```
+
+### plot BUCHI
+```{r}
+#PT_BUCHI <- resCV_2
+#save(PT_SCIO,PT_BUCHI,file = here::here("output","Results_PreTreat.RData"))
+
+ggplot(PT_BUCHI, aes(x=PT, y=ROC, fill=PT)) + 
+  geom_boxplot()   + theme_bw() + ylim(.6, 1) #+ ggtitle("")
+ 
+ggplot(PT_BUCHI, aes(x=PT, y=Sens, fill=PT)) + 
+  geom_boxplot() + theme_bw() + ylim(.9, 1) #+ ggtitle("")
+
+ggplot(PT_BUCHI, aes(x=PT, y=Spec, fill=PT)) + 
+  geom_boxplot()  + theme_bw() + ylim(0, .7) #+ ggtitle("") 
+
+
+```
+
+### table BUCHI
+```{r}
+ PT_BUCHI%>%group_by(PT)%>%
+   summarise(ROCm = round(mean(ROC, na.rm = T),3),
+            ROC.sd = round(sd(ROC, na.rm = T),3),
+            Spec.m = round(mean(Spec, na.rm = T),3),
+            Spec.sd = round(sd(Spec, na.rm = T),3),
+            Sens.m = round(mean(Sens, na.rm = T),3),
+            Sens.sd = round(sd(Sens, na.rm = T),3)) %>%
+       gt()  %>%     tab_options(table.font.size = pct(75))
+```
+
+### Select the best PT method
+```{r}
+NIR <- "SCIO"
+load(file=here::here("output","dadosSCIO_PT.RData"))
+
+#NIR <- "BUCHI"
+#load(file=here::here("output","dadosBUCHI_PT.RData"))
+```
+
+### 1st + MSC
+```{r}
+dados1 <- dados2[[7]]
+dados1$Waxy <- as.factor(dados1$Waxy)
+#modelsnames <- c("knn", "C5.0", "xgbLinear","parRF")
+modeln <- "knn"
+model <- list()
+#n <- length(modelsnames)
+n=1
+modelFit2 <- list()
+pCM <- list()
+
+#for (j in 1:n) {
+  modelFit <- list()
+  index <- list()
+  training <- list()
+  testing <- list()
+  CM <- list()
+
+for (i in 1:5) {
+   set.seed(i)
+    index[[i]] <- createDataPartition(dados1[,"Waxy"], p = .8, list = FALSE)
+    training[[i]] <- dados1[index[[i]], ]
+    testing[[i]] <- dados1[-index[[i]], ]
+  
+    set.seed(i)
+    modelFit[[i]] <- train(Waxy ~ ., data = training[[i]], method = modelsnames[1], 
+                           trControl = ctrl,preProcess = c("center","scale"),tuneLength = 1) 
+    
+    modelPredict <- predict(modelFit[[i]],newdata = testing[[i]])
+    CM[[i]] <- confusionMatrix(modelPredict, testing[[i]]$Waxy)
+}
+ # modelFit2[[j]] <- modelFit
+ #  pCM[[j]] <- CM 
+  #}
+
+if(NIR=="SCIO"){save(CM, modelFit, 
+                     file = here::here("output",paste(modeln,"SCIO_Model.RData",sep ="_")))}
+
+if(NIR=="BUCHI"){save(CM, modelFit, 
+                     file = here::here("output",paste(modeln,"BUCHI_Model.RData",sep ="_")))}
+
+```
+

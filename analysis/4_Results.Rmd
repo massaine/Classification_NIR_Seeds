@@ -1,0 +1,84 @@
+---
+title: "4_Results"
+author: "massaine"
+date: "2022-11-30"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+```{r}
+
+```
+
+### Function Confusion matrix
+```{r}
+prettyConfused<-function(Actual,Predict,colors=c("white","red4","dodgerblue3"),text.scl=5){
+  actual = as.data.frame(table(Actual))
+  names(actual) = c("Actual","ActualFreq")
+  #build confusion matrix
+  confusion = as.data.frame(table(Actual, Predict))
+  names(confusion) = c("Actual","Predicted","Freq")
+  #calculate percentage of test cases based on actual frequency
+  confusion = merge(confusion, actual, by=c('Actual','Actual'))
+  confusion$Percent = confusion$Freq/confusion$ActualFreq*100
+  confusion$ColorScale<-confusion$Percent*-1
+  confusion[which(confusion$Actual==confusion$Predicted),]$ColorScale<-confusion[which(confusion$Actual==confusion$Predicted),]$ColorScale*-1
+  confusion$Label<-paste(round(confusion$Percent,0),"%, n=",confusion$Freq,sep="")
+  tile <- ggplot() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                          panel.background = element_blank(), axis.line = element_blank(),
+                          axis.title.x = element_text(size = rel(1)),
+                          axis.title.y = element_text(size = rel(1)),
+                          axis.text.x = element_text(size=13),axis.text.y = element_text(size=13)) +
+    geom_tile(aes(x=Actual, y=Predicted,fill=ColorScale),data=confusion, color="black",size=0.1) +
+    labs(x="Reference",y="Predicted")
+  
+  tile = tile +
+    geom_text(aes(x=Actual,y=Predicted, label=Label),data=confusion, size=text.scl, colour="black") +
+    scale_fill_gradient2(low=colors[2],high=colors[3],mid=colors[1],midpoint = 0,guide='none')
+}
+
+```
+
+
+
+```{r}
+
+rCM <- matrix(NA,ncol = 3,nrow = 5)
+pCM <- list() #PARAMETROS
+tCM <- list() #TABLE
+modelname <- "knn"
+
+for (i in 1:5) {
+  rCM[i,1] <- CM[[i]]$overall[1]
+  rCM[i,2] <- CM[[i]]$overall[2]
+  pCM[[i]] <- as.data.frame(CM[[i]]$byClass)
+  tCM[[i]] <- CM[[i]]$table
+  pCM[[i]]$Model <- modelname
+  pCM[[i]]$data <- NIR
+}
+
+resCV <- list()
+parCM1 <- list()
+
+for (i in 1:n) {
+parCM <- matrix(NA,nrow=5,ncol=13)
+
+    for (j in 1:5) {
+      parCM[j,3:13] <- round(t(pCM[[j]]$`CM[[i]]$byClass`),2)
+      #parCM[j,2] <- time_mod1[i] 
+      colnames(parCM) <- c("NIR","Time_mod" ,rownames(pCM[[1]]))
+    }
+  parCM1[[i]] <- as.data.frame(parCM)
+  #resCV[[i]] <- resCV_2
+}
+
+#resCV1 <- do.call(rbind,resCV)
+parCM1 <- do.call(rbind,parCM1)
+parCM1[1:150,1] <- "ASD"
+parCM1[151:nrow(parCM1),1] <- "BUCCHI"
+parCM1[,3:ncol(parCM1)] <- sapply(parCM1[,3:ncol(parCM1)], as.numeric)
+```
+

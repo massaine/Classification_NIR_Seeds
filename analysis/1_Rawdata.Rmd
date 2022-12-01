@@ -1,0 +1,80 @@
+---
+title: "1_Rawdata"
+author: "massaine"
+date: "2022-11-30"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+```{r}
+NIR <- "BUCCHI"
+dados<-read.table(here::here("data","DadosNIR_fen_BUCCHI_Seeds_2019.txt"), header=T, sep="\t", na.strings="NA", strip.white=TRUE, check.names=FALSE)
+dados <- cbind(dados$Waxy.Phenotype,dados[,13:ncol(dados)])
+dados <- dados[!is.na(dados$`1000`),]  
+dados[, c(2:ncol(dados))] <- sapply(dados[, c(2:ncol(dados))], as.numeric)
+colnames(dados)[1] <- "Waxy"
+dados$Waxy <- as.factor(dados$Waxy)
+table(dados$Waxy)
+```
+
+### Removing outliars
+```{r}
+data <- list()
+full.sd <- list()
+results<- list()
+geno <- unique(dados$Waxy)                                 
+
+for(i in 1:length(geno)){
+  data[[i]] <- dados[dados$Waxy==geno[i],]
+  full.sd <- transform(data[[i]], SD=apply(data[[i]][,2:ncol(data[[i]])], 1, sd, na.rm = TRUE))
+  full.sd.sd <- sd(full.sd$SD, na.rm=TRUE)
+  cutoff <- 1.5*full.sd.sd
+  sd.mean <- mean(full.sd$SD, na.rm=TRUE)
+  results[[i]] <- data[[i]][which(as.logical((sd.mean-cutoff<full.sd$SD)*(full.sd$SD<sd.mean+cutoff))), ]}
+dados_semOut <- do.call(rbind,results)  
+table(dados_semOut$Waxy)
+```
+
+### Save data
+```{r}
+save(dados_semOut, file = here::here("output", "Data_BUCHI.RData"))
+```
+
+
+### Load SCIO DATA
+```{r}
+dados<-read.table(here::here("data","DadosNIR_fen_SCIO_Seeds_2019.txt"), header=T, sep="\t", na.strings="NA", strip.white=TRUE, check.names=FALSE)
+dados <- cbind(dados$Waxy.Phenotype,dados[,10:ncol(dados)])
+dados <- dados[!is.na(dados$`740`),]  
+dados[, c(2:ncol(dados))] <- sapply(dados[, c(2:ncol(dados))], as.numeric)
+colnames(dados)[1] <- "Waxy"
+dados$Waxy <- as.factor(dados$Waxy)
+table(dados$Waxy)
+```
+
+### Removing outliars
+```{r}
+data <- list()
+full.sd <- list()
+results<- list()
+geno <- unique(dados$Waxy)                                 
+
+for(i in 1:length(geno)){
+  data[[i]] <- dados[dados$Waxy==geno[i],]
+  full.sd <- transform(data[[i]], SD=apply(data[[i]][,2:ncol(data[[i]])], 1, sd, na.rm = TRUE))
+  full.sd.sd <- sd(full.sd$SD, na.rm=TRUE)
+  cutoff <- 1.5*full.sd.sd
+  sd.mean <- mean(full.sd$SD, na.rm=TRUE)
+  results[[i]] <- data[[i]][which(as.logical((sd.mean-cutoff<full.sd$SD)*(full.sd$SD<sd.mean+cutoff))), ]}
+
+dados_semOut <- do.call(rbind,results)  
+table(dados_semOut$Waxy)
+```
+
+### Save data
+```{r}
+save(dados_semOut, file = here::here("output", "Data_SCIO.RData"))
+```
+

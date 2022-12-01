@@ -1,0 +1,161 @@
+---
+title: "2_PreTreatment"
+author: "massaine"
+date: "2022-11-30"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+### Library
+```{r}
+options(stringsAsFactors=FALSE)
+library(prospectr)
+library(caret)
+library(mlbench)
+library(pROC)
+library(C50)
+library(stringr)
+```
+
+###Load data
+```{r}
+NIR <- "BUCHI"
+load(file=here::here("output","Data_BUCHI.RData"))
+
+#NIR <- "SCIO"
+#load(file=here::here("output","Data_SCIO.RData"))
+```
+
+### 1) raw data
+```{r}
+pt <- list()
+raw <- dados_semOut[,2:ncol(dados_semOut)]
+raw <- sapply(raw[,c(1:ncol(raw))],as.numeric)
+
+plot(as.numeric(colnames(raw)), 
+     raw[1,], type = "l",lwd = 1.5, xlab = "Wavelength, nm",
+     main = "raw data",ylab = "Absorbance")
+
+pt[[1]] <- (blockNorm(X = raw, targetnorm = 1)$Xscaled)
+```
+
+### 2) first derivative
+```{r}
+d1 <- t(diff(t(raw), differences = 1,lag = 10))
+
+plot(as.numeric(colnames(d1)), 
+     d1[1,], type = "l",lwd = 1.5, xlab = "Wavelength, nm",
+      main = "1st", ylab = "Absorbance")
+pt[[2]] <- round(blockNorm(X = d1, targetnorm = 1)$Xscaled,12)
+
+```
+
+### 3) DT
+```{r}
+raw_dt <- detrend(X =raw, wav = as.numeric(colnames(raw)))
+
+plot(as.numeric(colnames(raw_dt)), 
+     raw_dt[1,], type = "l",main = "raw + DT",lwd = 1.5, 
+     xlab = "Wavelength, nm", 
+     ylab = "Absorbance")
+pt[[3]] <- round(blockNorm(X = raw_dt, targetnorm = 1)$Xscaled,12)
+```
+
+### 4) MSC
+```{r}
+raw_msc <- msc(X = raw, ref_spectrum = colMeans(raw))
+
+plot(as.numeric(colnames(raw_msc)), 
+     raw_msc[1,],type = "l",main = "MSC",lwd = 1.5, 
+     xlab = "Wavelength, nm", 
+     ylab = "Absorbance")
+pt[[4]] <- round(blockNorm(X = raw_msc, targetnorm = 1)$Xscaled,12)
+```
+
+### 5) SNV
+```{r}
+raw_snv <- standardNormalVariate(X = raw)
+
+plot(as.numeric(colnames(raw_snv)), 
+     raw_snv[1,], type = "l",main ="1st + SNV",
+     lwd = 1.5, xlab = "Wavelength, nm", 
+     ylab = "Absorbance")
+pt[[5]] <- round(blockNorm(X = raw_snv, targetnorm = 1)$Xscaled,12)
+```
+
+### 6) 1st + DT
+```{r}
+d1_dt <- detrend(X =d1, wav = as.numeric(colnames(d1)))
+
+plot(as.numeric(colnames(d1_dt)), 
+     d1_dt[1,], type = "l",main = "1st + DT",lwd = 1.5, 
+     xlab = "Wavelength, nm", 
+     ylab = "Absorbance")
+pt[[6]] <- round(blockNorm(X = d1_dt, targetnorm = 1)$Xscaled,12)
+
+```
+
+### 7) 1st + MSC
+```{r}
+d1_msc <- msc(X = d1, ref_spectrum = colMeans(d1))
+
+plot(as.numeric(colnames(d1_msc)), 
+     d1_msc[1,],type = "l",main = "1st + MSC",lwd = 1.5, 
+     xlab = "Wavelength, nm", ylab = "Absorbance")
+pt[[7]] <- round(blockNorm(X = d1_msc, targetnorm = 1)$Xscaled,12)
+```
+
+### 8) DT + MSC
+```{r}
+dt_msc <- msc(X = raw_dt, ref_spectrum = colMeans(raw_dt))
+
+plot(as.numeric(colnames(dt_msc)), 
+     dt_msc[1,],type = "l",main = "DT + MSC",lwd = 1.5, 
+     xlab = "Wavelength, nm", 
+     ylab = "Absorbance")
+pt[[8]] <- round(blockNorm(X = dt_msc, targetnorm = 1)$Xscaled,12)
+```
+
+### 9) 1st + SG + DT
+```{r}
+d1_sg <- savitzkyGolay(d1, p = 3, w = 11, m = 0)
+d1_sg_dt <- detrend(X =d1_sg, wav = as.numeric(colnames(d1_sg)))
+
+plot(as.numeric(colnames(d1_sg_dt)), 
+     d1_sg_dt[1,], type = "l",main = "1st + SG + DT",
+     lwd = 1.5, xlab = "Wavelength, nm", 
+     ylab = "Absorbance")
+pt[[9]] <- round(blockNorm(X = d1_sg_dt, targetnorm = 1)$Xscaled,12)
+```
+
+
+```{r, eval=F}
+dados2 <- list()
+i=1
+for (i in 1:9) {
+      x <-cbind(as.matrix(dados_semOut[,1]),pt[[i]])
+      dados2[[i]]<-as.data.frame(x)
+      n <- ncol(dados2[[i]])
+      dados2[[i]][,c(2:n)] <- sapply(dados2[[i]][,c(2:n)], 
+                               as.numeric)
+      colnames(dados2[[i]])[1] <- "Waxy"
+}
+
+#str(dados2)
+```
+
+### Save RData + pretreatment methods
+```{r, eval=F}
+if(NIR=="SCIO"){save(dados2,file = here::here("output","dadosSCIO_PT.RData"))}
+
+if(NIR=="BUCHI"){save(dados2,file =here::here("output","dadosBUCHI_PT.RData"))}
+
+```
+
+
+```
+
+
+
+
