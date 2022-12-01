@@ -37,7 +37,7 @@ plot(as.numeric(colnames(raw)),
      raw[1,], type = "l",lwd = 1.5, xlab = "Wavelength, nm",
      main = "raw data",ylab = "Absorbance")
 
-pt[[1]] <- (blockNorm(X = raw, targetnorm = 1)$Xscaled)
+pt[[1]] <- round(blockNorm(X = raw, targetnorm = 1)$Xscaled,8)
 ```
 
 ### 2) first derivative
@@ -47,7 +47,7 @@ d1 <- t(diff(t(raw), differences = 1,lag = 10))
 plot(as.numeric(colnames(d1)), 
      d1[1,], type = "l",lwd = 1.5, xlab = "Wavelength, nm",
       main = "1st", ylab = "Absorbance")
-pt[[2]] <- round(blockNorm(X = d1, targetnorm = 1)$Xscaled,12)
+pt[[2]] <- round(blockNorm(X = d1, targetnorm = 1)$Xscaled,8)
 
 ```
 
@@ -59,7 +59,7 @@ plot(as.numeric(colnames(raw_dt)),
      raw_dt[1,], type = "l",main = "raw + DT",lwd = 1.5, 
      xlab = "Wavelength, nm", 
      ylab = "Absorbance")
-pt[[3]] <- round(blockNorm(X = raw_dt, targetnorm = 1)$Xscaled,12)
+pt[[3]] <- round(blockNorm(X = raw_dt, targetnorm = 1)$Xscaled,8)
 ```
 
 ### 4) MSC
@@ -70,7 +70,7 @@ plot(as.numeric(colnames(raw_msc)),
      raw_msc[1,],type = "l",main = "MSC",lwd = 1.5, 
      xlab = "Wavelength, nm", 
      ylab = "Absorbance")
-pt[[4]] <- round(blockNorm(X = raw_msc, targetnorm = 1)$Xscaled,12)
+pt[[4]] <- round(blockNorm(X = raw_msc, targetnorm = 1)$Xscaled,8)
 ```
 
 ### 5) SNV
@@ -81,7 +81,7 @@ plot(as.numeric(colnames(raw_snv)),
      raw_snv[1,], type = "l",main ="1st + SNV",
      lwd = 1.5, xlab = "Wavelength, nm", 
      ylab = "Absorbance")
-pt[[5]] <- round(blockNorm(X = raw_snv, targetnorm = 1)$Xscaled,12)
+pt[[5]] <- round(blockNorm(X = raw_snv, targetnorm = 1)$Xscaled,8)
 ```
 
 ### 6) 1st + DT
@@ -92,7 +92,7 @@ plot(as.numeric(colnames(d1_dt)),
      d1_dt[1,], type = "l",main = "1st + DT",lwd = 1.5, 
      xlab = "Wavelength, nm", 
      ylab = "Absorbance")
-pt[[6]] <- round(blockNorm(X = d1_dt, targetnorm = 1)$Xscaled,12)
+pt[[6]] <- round(blockNorm(X = d1_dt, targetnorm = 1)$Xscaled,8)
 
 ```
 
@@ -103,7 +103,7 @@ d1_msc <- msc(X = d1, ref_spectrum = colMeans(d1))
 plot(as.numeric(colnames(d1_msc)), 
      d1_msc[1,],type = "l",main = "1st + MSC",lwd = 1.5, 
      xlab = "Wavelength, nm", ylab = "Absorbance")
-pt[[7]] <- round(blockNorm(X = d1_msc, targetnorm = 1)$Xscaled,12)
+pt[[7]] <- round(blockNorm(X = d1_msc, targetnorm = 1)$Xscaled,8)
 ```
 
 ### 8) DT + MSC
@@ -114,7 +114,7 @@ plot(as.numeric(colnames(dt_msc)),
      dt_msc[1,],type = "l",main = "DT + MSC",lwd = 1.5, 
      xlab = "Wavelength, nm", 
      ylab = "Absorbance")
-pt[[8]] <- round(blockNorm(X = dt_msc, targetnorm = 1)$Xscaled,12)
+pt[[8]] <- round(blockNorm(X = dt_msc, targetnorm = 1)$Xscaled,8)
 ```
 
 ### 9) 1st + SG + DT
@@ -126,7 +126,7 @@ plot(as.numeric(colnames(d1_sg_dt)),
      d1_sg_dt[1,], type = "l",main = "1st + SG + DT",
      lwd = 1.5, xlab = "Wavelength, nm", 
      ylab = "Absorbance")
-pt[[9]] <- round(blockNorm(X = d1_sg_dt, targetnorm = 1)$Xscaled,12)
+pt[[9]] <- round(blockNorm(X = d1_sg_dt, targetnorm = 1)$Xscaled,8)
 ```
 
 
