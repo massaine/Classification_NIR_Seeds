@@ -26,12 +26,12 @@ library(gt)
 NIR <- "SCIO"
 load(file=here::here("output","dadosSCIO_PT.RData"))
 
-#NIR <- "BUCHI"
-#load(file=here::here("output","dadosBUCHI_PT.RData"))
+NIR <- "BUCHI"
+load(file=here::here("output","dadosBUCHI_PT.RData"))
 ```
 
 ### test using PLS model
-```{r}
+```{r, eval=F}
 ctrl <- trainControl(method="repeatedcv",repeats = 5) 
 ```
 
@@ -74,7 +74,6 @@ levels(resCV_2$PT) <- c("raw data", "1st","DT","MSC","SNV","1st + DT",
 ```{r}
 #PT_BUCHI <- resCV_2
 #PT_SCIO <- resCV_2
-
 #save(PT_SCIO,PT_BUCHI,file = here::here("output","Results_PreTreat.RData"))
 load(file = here::here("output","Results_PreTreat.RData"))
 ```
@@ -83,35 +82,32 @@ load(file = here::here("output","Results_PreTreat.RData"))
 ### plot 
 ```{r}
 
-#ggplot(PT_BUCHI, aes(x=PT, y=Accuracy, fill=PT)) + 
-#  geom_boxplot()   + theme_bw() + ylim(.6, 1) + ggtitle("BUCHI")
+ggplot(PT_BUCHI, aes(x=PT, y=Accuracy, fill=PT)) + 
+  geom_boxplot()   + theme_bw() + ylim(.8, 1) + ggtitle("BUCHI")
  
-#ggplot(PT_BUCHI, aes(x=PT, y=Kappa, fill=PT)) + 
-#  geom_boxplot() + theme_bw() + ylim(.9, 1) + ggtitle("BUCHI")
+ggplot(PT_BUCHI, aes(x=PT, y=Kappa, fill=PT)) + 
+  geom_boxplot() + theme_bw() + ylim(0, 1) + ggtitle("BUCHI")
 
 ggplot(PT_SCIO, aes(x=PT, y=Accuracy, fill=PT)) + 
   geom_boxplot()   + theme_bw() + ylim(.8, 1) + ggtitle("SCIO")
  
 ggplot(PT_SCIO, aes(x=PT, y=Kappa, fill=PT)) + 
-  geom_boxplot() + theme_bw() + ylim(0, .8) + ggtitle("SCIO")
+  geom_boxplot() + theme_bw() + ylim(0, 1) + ggtitle("SCIO")
 
 ```
 
 ### table BUCHI
-```{r, eval=F}
+```{r}
  PT_BUCHI%>%group_by(PT)%>%
-   summarise(ROCm = round(mean(ROC, na.rm = T),3),
-            ROC.sd = round(sd(ROC, na.rm = T),3),
-            Spec.m = round(mean(Spec, na.rm = T),3),
-            Spec.sd = round(sd(Spec, na.rm = T),3),
-            Sens.m = round(mean(Sens, na.rm = T),3),
-            Sens.sd = round(sd(Sens, na.rm = T),3)) %>%
+   summarise(Accm = round(mean(Accuracy, na.rm = T),3),
+            Acc.sd = round(sd(Accuracy, na.rm = T),3),
+            Kap.m = round(mean(Kappa, na.rm = T),3),
+            Kap.sd = round(sd(Kappa, na.rm = T),3)) %>%
        gt()  %>%     tab_options(table.font.size = pct(75))
 ```
 
 ### table SCIO
 ```{r}
-
  PT_SCIO%>%group_by(PT)%>%
    summarise(Accm = round(mean(Accuracy, na.rm = T),3),
             Acc.sd = round(sd(Accuracy, na.rm = T),3),

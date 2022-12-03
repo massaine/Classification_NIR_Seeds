@@ -23,11 +23,8 @@ library(gt)
 ```
 
 ```{r, eval=FALSE}
-NIR <- "SCIO"
-load(file=here::here("output","dadosSCIO_PT.RData"))
-
-#NIR <- "BUCHI"
-#load(file=here::here("output","dadosBUCHI_PT.RData"))
+NIR <- "BUCHI"
+load(file=here::here("output","dadosBUCHI_PT.RData"))
 ```
 
 ### test using PLS model

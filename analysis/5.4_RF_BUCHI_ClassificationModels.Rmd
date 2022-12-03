@@ -39,8 +39,10 @@ ctrl <- trainControl(method="repeatedcv",repeats = 5)
 dados1 <- dados2[[7]]
 dados1$Waxy <- as.factor(dados1$Waxy)
 #modelsnames <- c("knn", "C5.0", "xgbLinear","parRF")
-modelsnames <- c("knn")
+modelsnames <- c("parRF")
+modeln <- "parRF"
 model <- list()
+#n <- length(modelsnames)
 n=1
 modelFit2 <- list()
 pCM <- list()
@@ -77,7 +79,7 @@ if(NIR=="SCIO")
 
 if(NIR=="BUCHI")
 {save(CM, modelFit,file =here::here("output",
-                   paste(modelsnames,"BUCHI_Model.RData",sep ="_")))}
+                   paste(modeln,"BUCHI_Model.RData",sep ="_")))}
 
 ```
 
