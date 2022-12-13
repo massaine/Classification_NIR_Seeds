@@ -20,6 +20,7 @@ library(C50)
 library(stringr)
 library(dplyr)
 library(gt)
+library(ggpubr) 
 ```
 
 ```{r, eval=FALSE}
