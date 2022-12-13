@@ -42,8 +42,8 @@ ctrl <- trainControl(method="repeatedcv",repeats = 5)
 dados1 <- dados2[[7]]
 dados1$Waxy <- as.factor(dados1$Waxy)
 #modelsnames <- c("knn", "C5.0", "xgbLinear","parRF")
-modelsnames <- c("xgbLinear")
-modeln <- "xgbLinear"
+modelsnames <- c("parRF")
+modeln <- "parRF"
 model <- list()
 #n <- length(modelsnames)
 n=1
@@ -57,12 +57,13 @@ pCM <- list()
   testing <- list()
   CM <- list()
 
+  i=1
 for (i in 1:5) {
    set.seed(i)
     index[[i]] <- createDataPartition(dados1[,"Waxy"], p = .8, list = FALSE)
     training[[i]] <- dados1[index[[i]], ]
     testing[[i]] <- dados1[-index[[i]], ]
-  
+    
     set.seed(i)
     modelFit[[i]] <- train(Waxy ~ ., data = training[[i]], 
                            method = modelsnames[1], 
@@ -79,7 +80,9 @@ for (i in 1:5) {
 if(NIR=="SCIO")
 {save(CM, modelFit,file =here::here("output",
                    paste(modeln,"SCIO_Model.RData",sep ="_")))}
-
+if(NIR=="SCIO")
+{save(training,testing,file =here::here("output","SCIO_testing_set.RData"))}
+  
 if(NIR=="BUCHI")
 {save(CM, modelFit,file =here::here("output",
                    paste(modeln,"BUCHI_Model.RData",sep ="_")))}

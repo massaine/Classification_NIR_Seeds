@@ -1,0 +1,287 @@
+---
+title: "6_Selecao de Variaveis"
+author: "massaine"
+date: "2022-11-30"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+### Function Confusion matrix
+```{r}
+prettyConfused<-function(Actual,Predict,colors=c("white","red4",
+                                     "dodgerblue3"),text.scl=5){
+  actual = as.data.frame(table(Actual))
+  names(actual) = c("Actual","ActualFreq")
+  #build confusion matrix
+  confusion = as.data.frame(table(Actual, Predict))
+  names(confusion) = c("Actual","Predicted","Freq")
+  #calculate percentage of test cases based on actual frequency
+  confusion = merge(confusion, actual, by=c('Actual','Actual'))
+  confusion$Percent = confusion$Freq/confusion$ActualFreq*100
+  confusion$ColorScale<-confusion$Percent*-1
+  confusion[which(confusion$Actual==confusion$Predicted),]$ColorScale<-confusion[which(confusion$Actual==confusion$Predicted),]$ColorScale*-1
+  confusion$Label<-paste(round(confusion$Percent,0),"%, n=",
+                         confusion$Freq,sep="")
+  tile <- ggplot() + theme(panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(),
+                          panel.background = element_blank(), 
+                          axis.line = element_blank(),
+                          axis.title.x = element_text(size = rel(1)),
+                          axis.title.y = element_text(size = rel(1)),
+                          axis.text.x = element_text(size=13),
+                          axis.text.y = element_text(size=13)) +
+              geom_tile(aes(x=Actual, y=Predicted,fill=ColorScale),
+              data=confusion, color="black",size=0.1) +
+              labs(x="Reference",y="Predicted")
+  
+  tile = tile + geom_text(aes(x=Actual,y=Predicted, label=Label),
+              data=confusion, size=text.scl, colour="black") +
+               scale_fill_gradient2(low=colors[2],
+               high=colors[3],
+               mid=colors[1],midpoint = 0,guide='none')
+}
+library(caret)
+```
+
+### Load results from classification models (SCIO)
+```{r,eval=F}
+load(file=here::here("output","xgbLinear_SCIO_Model.RData"))
+load(file=here::here("output","SCIO_testing_set.RData"))
+
+modelFit_scio <- modelFit[[1]]
+Imp <- varImp(modelFit_scio, scale = FALSE)
+plot(Imp, top = 30)
+impMat <- as.data.frame(Imp$importance)
+names <- str_split_fixed(rownames(impMat), "`", 3)
+impMat$Waves <- names[,2]
+impMat$Overall
+rownames(impMat)<-seq(1:nrow(impMat))
+head(impMat)
+impMat$perc[1] <- 100
+for (i in 2:nrow(impMat)) {impMat$perc[i] <- (impMat[i,1]*100)/impMat[1,1] }
+
+plotimpS <- ggplot(data= impMat, aes(x=as.numeric(Waves), y=perc)) +
+          geom_point() + theme_bw() + theme(legend.title = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_blank()) +
+          geom_hline(yintercept = 30,colour ="red") + ggtitle("SCiO") +
+          scale_y_continuous("Variable importance (%)",
+          breaks = seq(0,100,20)) + scale_x_continuous("Wavelengths")
+
+plotimpS
+```
+
+### Classification models after Var. Selection (100 waveslength)
+```{r, eval=FALSE}
+ctrl <- trainControl(method="repeatedcv",repeats = 5) 
+sel <- as.numeric(impMat$Waves[1:34])                 # 30%
+sel1 <- as.character(sel[order(sel,decreasing = F)])
+trainingSCIO <- training[[1]][,c("Waxy",sel1)]
+testingSCIO <- testing[[1]]
+testingSCIO <- testingSCIO[,c("Waxy",sel1)]
+levels(testingSCIO$Waxy) <- list(Nonwaxy = "No", Waxy = "Waxy")
+
+set.seed(1)
+modelFitSEL_S1 <- train(Waxy ~ ., data = trainingSCIO, 
+                        method = "knn", trControl = ctrl,           
+                      preProcess = c("center","scale"))
+set.seed(1)
+modelFitSEL_S2 <- train(Waxy ~ ., data = trainingSCIO, 
+                        method = "C5.0", trControl = ctrl,           
+                      preProcess = c("center","scale"))
+set.seed(1)
+modelFitSEL_S3 <- train(Waxy ~ ., data = trainingSCIO, 
+                        method = "xgbLinear", trControl = ctrl,           
+                      preProcess = c("center","scale"))
+set.seed(1)
+modelFitSELS_S4 <- train(Waxy ~ ., data = trainingSCIO, 
+                         method = "parRF", trControl = ctrl,           
+                      preProcess = c("center","scale"))
+
+#save(modelFitSEL_S1,modelFitSEL_S2,modelFitSEL_S3,modelFitSEL_S4,
+#     file = here::here("output","SCIO_Model_Sel_Var.RData"))
+```
+
+
+### Load results from classification models (BUCHI)
+```{r,eval=F}
+load(file=here::here("output","xgbLinear_BUCHI_Model.RData"))
+load(file=here::here("output","BUCHI_testing_set.RData"))
+
+modelFit_BUCHI <- modelFit[[1]]
+Imp <- varImp(modelFit_BUCHI, scale = FALSE)
+plot(Imp, top = 30)
+impMat <- as.data.frame(Imp$importance)
+names <- str_split_fixed(rownames(impMat), "`", 3)
+impMat$Waves <- names[,2]
+impMat$Overall
+rownames(impMat)<-seq(1:nrow(impMat))
+head(impMat)
+impMat$perc[1] <- 100
+for (i in 2:nrow(impMat)) {impMat$perc[i] <- (impMat[i,1]*100)/impMat[1,1] }
+
+plotimpB <- ggplot(data= impMat, aes(x=as.numeric(Waves), y=perc)) +
+          geom_point() + theme_bw() + theme(legend.title = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_blank()) +
+          geom_hline(yintercept = 30,colour ="red") + 
+          ggtitle("NIRFlex N-500") +
+          scale_y_continuous("Variable importance (%)",
+          breaks = seq(0,100,20)) + scale_x_continuous("Wavelengths")
+
+plotimpB
+```
+
+### Classification models after Var. Selection (100 waveslength)
+```{r,eval=FALSE}
+ctrl <- trainControl(method="repeatedcv",repeats = 5) 
+sel <- as.numeric(impMat$Waves[1:37])                 # 30%
+sel1 <- as.character(sel[order(sel,decreasing = F)])
+trainingBUCHI <- training[[1]][,c("Waxy",sel1)]
+testingBUCHI <- testing[[1]]
+testingBUCHI <- testingBUCHI[,c("Waxy",sel1)]
+levels(testingBUCHI$Waxy) <- list(Nonwaxy = "No", Waxy = "Waxy")
+
+set.seed(1)
+modelFitSEL_S1 <- train(Waxy ~ ., data = trainingBUCHI, 
+                        method = "knn", trControl = ctrl,           
+                      preProcess = c("center","scale"))
+set.seed(1)
+modelFitSEL_S2 <- train(Waxy ~ ., data = trainingBUCHI, 
+                        method = "C5.0", trControl = ctrl,           
+                      preProcess = c("center","scale"))
+set.seed(1)
+modelFitSEL_S3 <- train(Waxy ~ ., data = trainingBUCHI, 
+                        method = "xgbLinear", trControl = ctrl,           
+                      preProcess = c("center","scale"))
+set.seed(1)
+modelFitSEL_S4 <- train(Waxy ~ ., data = trainingBUCHI, 
+                         method = "parRF", trControl = ctrl,           
+                      preProcess = c("center","scale"))
+
+save(modelFitSEL_S1,modelFitSEL_S2,modelFitSEL_S3,modelFitSEL_S4,
+     file = here::here("output","BUCHI_Model_Sel_Var.RData"))
+
+```
+
+### Plot
+```{r}
+tiff(file = "Figure3_SelVariables.tiff", 
+               width = 14, height=8, res = 700, 
+               compression = "lzw", units = "cm")
+ggarrange(plotimpS,plotimpB,ncol=2,nrow=1)
+dev.off()
+```
+
+
+
+
+
+
+
+
+
+
+### 
+```{r}
+results <- resamples(list(model1 = modelFitSEL_S1, model2 = modelFitSEL_S2,
+                      model3 = modelFitSEL_S3, model4 = modelFitSELS_S4))
+
+summary(results)
+
+modelname <- "parRF_BUCHI"
+res <- resamples(modelFit)
+res <- res$values
+resCV_1 <- list()
+for(i in 1:5){ 
+  resCV_1[[i]]<-res[,c(paste(paste("Model",i,sep=""),"~Accuracy",sep=""), 
+                       paste(paste("Model",i,sep=""),"~Kappa",sep=""))]
+  colnames(resCV_1[[i]]) <- c("Accuracy","Kappa")}
+
+
+
+
+T.RES_S <- matrix(NA,ncol = 5,nrow = 4)
+colnames(T.RES_S) <- c("Acuracy","sd.Acuracy","Kappa","sd.Kappa","Model")
+T.RES_S[1,1] <- mean(res1$V2)
+T.RES_S[1,2] <- sd(res1$V2)
+T.RES_S[1,3] <- mean(res1$V1)
+T.RES_S[1,4] <- sd(res1$V1)
+T.RES_S[1,5] <- res1$model[1]
+T.RES_S[2,1] <- mean(res2$V2)
+T.RES_S[2,2] <- sd(res2$V2)
+T.RES_S[2,3] <- mean(res2$V1)
+T.RES_S[2,4] <- sd(res2$V1)
+T.RES_S[2,5] <- res2$model[1]
+T.RES_S[3,1] <- mean(res3$V2)
+T.RES_S[3,2] <- sd(res3$V2)
+T.RES_S[3,3] <- mean(res3$V1)
+T.RES_S[3,4] <- sd(res3$V1)
+T.RES_S[3,5] <- res3$model[1]
+T.RES_S[4,1] <- mean(res4$V2)
+T.RES_S[4,2] <- sd(res4$V2)
+T.RES_S[4,3] <- mean(res4$V1)
+T.RES_S[4,4] <- sd(res4$V1)
+T.RES_S[4,5] <- res4$model[1]
+
+##### plots
+res1 <- as.data.frame(cbind(results$values$`model1~Kappa`,results$values$`model1~Accuracy`))
+res1$model <- rep(c("KNN_Sel"),50)
+res2 <- as.data.frame(cbind(results$values$`model2~Kappa`,results$values$`model2~Accuracy`))
+res2$model <- rep(c("CDT_Sel"),50)
+res3 <- as.data.frame(cbind(results$values$`model3~Kappa`,results$values$`model3~Accuracy`))
+res3$model <- rep(c("xgbLinear_Sel"),50)
+res4 <- as.data.frame(cbind(results$values$`model4~Kappa`,results$values$`model4~Accuracy`))
+res4$model <- rep(c("parRF_Sel"),50)
+
+res <- as.data.frame(rbind(res1,res2,res3,res4))
+res$NIR <- rep(c("SCiO"),dim(res)[1])
+colnames(res) <- c("Kappa","Accuracy","Model","NIR")
+res_SCIO <- res
+#save(res_SCIO,file="res_Seeds_SCIO_Sel.RData")
+res_SCIO$Model <- factor(res_SCIO$Model)
+res_SCIO$Kappa <- as.numeric(res_SCIO$Kappa)
+res_SCIO$Accuracy <- as.numeric(res_SCIO$Accuracy)
+
+KappaS <- ggplot(res_SCIO, aes(x=Model, y=Kappa, fill=Model)) +
+  geom_boxplot()   + theme_bw() + ylim(0, 1) +
+  labs(title="D) SCiO",fill = "Models") +
+  scale_fill_manual(values = c("#999999", "orange", "#56B4E9","olivedrab3"))
+
+AccuracyS <- ggplot(res_SCIO, aes(x=Model, y=Accuracy, fill=Model)) +
+  geom_boxplot() + theme_bw() + ylim(0.75, 1) +
+  labs(title="B) SCiO",fill = "Models") +
+  scale_fill_manual(values = c("#999999", "orange", "#56B4E9","olivedrab3"))
+
+
+### matriz de confus„o
+Model1Predict <- predict(modelFitSEL_S1,newdata = testingSCIO )
+levels(Model1Predict) <- list(Nonwaxy = "No", Waxy = "Waxy")
+confusionMatrix(Model1Predict, testingSCIO$Waxy.Phenotype )
+model1 <- prettyConfused(testingSCIO$Waxy.Phenotype,Model1Predict, colors=c("white","red4","dodgerblue3"),text.scl=5)+
+  labs(title="KNN_Sel")
+
+Model2Predict <- predict(modelFitSEL_S2,newdata = testingSCIO )
+levels(Model2Predict) <- list(Nonwaxy = "No", Waxy = "Waxy")
+confusionMatrix(Model2Predict, testingSCIO$Waxy.Phenotype )
+model2 <- prettyConfused(testingSCIO$Waxy.Phenotype,Model2Predict, colors=c("white","red4","dodgerblue3"),text.scl=5)+
+  labs(title="CDT_Sel")
+
+Model3Predict <- predict(modelFitSEL_S3,newdata = testingSCIO )
+levels(Model3Predict) <- list(Nonwaxy = "No", Waxy = "Waxy")
+confusionMatrix(Model3Predict, testingSCIO$Waxy.Phenotype )
+model3 <- prettyConfused(testingSCIO$Waxy.Phenotype,Model3Predict, colors=c("white","red4","dodgerblue3"),text.scl=5)+
+  labs(title="xgbLinear_Sel")
+
+Model4Predict <- predict(modelFitSELS_S4,newdata = testingSCIO )
+levels(Model4Predict) <- list(Nonwaxy = "No", Waxy = "Waxy")
+confusionMatrix(Model4Predict, testingSCIO$Waxy.Phenotype )
+model4 <- prettyConfused(testingSCIO$Waxy.Phenotype,Model4Predict, colors=c("white","red4","dodgerblue3"),text.scl=5) +
+  labs(title="parRF_Sel")
+
+figure_CM_S <- ggarrange(model1, model2,model3,model4, ncol = 2, nrow = 2, common.legend = TRUE)
+```
+

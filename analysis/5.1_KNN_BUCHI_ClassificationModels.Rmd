@@ -57,7 +57,7 @@ for (i in 1:5) {
     index[[i]] <- createDataPartition(dados1[,"Waxy"], p = .8, list = FALSE)
     training[[i]] <- dados1[index[[i]], ]
     testing[[i]] <- dados1[-index[[i]], ]
-  
+    
     set.seed(i)
     modelFit[[i]] <- train(Waxy ~ ., data = training[[i]], 
                            method = modelsnames[1], 
@@ -74,6 +74,8 @@ for (i in 1:5) {
 if(NIR=="SCIO")
 {save(CM, modelFit,file =here::here("output",
                    paste(modeln,"SCIO_Model.RData",sep ="_")))}
+if(NIR=="BUCHI")
+{save(training,testing,file =here::here("output","BUCHI_testing_set.RData"))}
 
 if(NIR=="BUCHI")
 {save(CM, modelFit,file =here::here("output",

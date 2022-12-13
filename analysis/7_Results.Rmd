@@ -1,0 +1,431 @@
+---
+title: "4_Results"
+author: "massaine"
+date: "2022-11-30"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+### Function Confusion matrix
+```{r}
+prettyConfused<-function(Actual,Predict,colors=c("white","red4",
+                                     "dodgerblue3"),text.scl=5){
+  actual = as.data.frame(table(Actual))
+  names(actual) = c("Actual","ActualFreq")
+  #build confusion matrix
+  confusion = as.data.frame(table(Actual, Predict))
+  names(confusion) = c("Actual","Predicted","Freq")
+  #calculate percentage of test cases based on actual frequency
+  confusion = merge(confusion, actual, by=c('Actual','Actual'))
+  confusion$Percent = confusion$Freq/confusion$ActualFreq*100
+  confusion$ColorScale<-confusion$Percent*-1
+  confusion[which(confusion$Actual==confusion$Predicted),]$ColorScale<-confusion[which(confusion$Actual==confusion$Predicted),]$ColorScale*-1
+  confusion$Label<-paste(round(confusion$Percent,0),"%, n=",
+                         confusion$Freq,sep="")
+  tile <- ggplot() + theme(panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(),
+                          panel.background = element_blank(), 
+                          axis.line = element_blank(),
+                          axis.title.x = element_text(size = rel(1)),
+                          axis.title.y = element_text(size = rel(1)),
+                          axis.text.x = element_text(size=13),
+                          axis.text.y = element_text(size=13)) +
+              geom_tile(aes(x=Actual, y=Predicted,fill=ColorScale),
+              data=confusion, color="black",size=0.1) +
+              labs(x="Reference",y="Predicted")
+  
+  tile = tile + geom_text(aes(x=Actual,y=Predicted, label=Label),
+              data=confusion, size=text.scl, colour="black") +
+               scale_fill_gradient2(low=colors[2],
+               high=colors[3],
+               mid=colors[1],midpoint = 0,guide='none')
+}
+library(caret)
+```
+
+### Load results from classification models (SCIO)
+```{r,eval=F}
+resCV_1 <- list()
+modelname <- c("KNN","CDT","xgbLinear","parRF")
+
+load(file=here::here("output","knn_SCIO_Model.RData"))
+resCV_1[[1]] <- modelFit[[1]]
+load(file=here::here("output","C5.0_SCIO_Model.RData"))
+resCV_1[[2]] <- modelFit[[1]]
+load(file=here::here("output","xgbLinear_SCIO_Model.RData"))
+resCV_1[[3]] <- modelFit[[1]]
+load(file=here::here("output","parRF_SCIO_Model.RData"))
+resCV_1[[4]] <- modelFit[[1]]
+
+res <- resamples(resCV_1)
+res <- res$values
+resCV_2 <- list()
+
+for(i in 1:4){ 
+  resCV_2[[i]]<-res[,c(paste(paste("Model",i,sep=""),"~Accuracy",sep=""), 
+                       paste(paste("Model",i,sep=""),"~Kappa",sep=""))]
+  resCV_2[[i]]$Model <- modelname[i]
+  colnames(resCV_2[[i]]) <- c("Accuracy","Kappa","Model")}
+
+Results_CV_S <- do.call(rbind,resCV_2)
+Results_CV_S$NIR <- "SCiO"
+```
+
+### Load results from classification models (BUCHI)
+```{r,eval=F}
+resCV_1 <- list()
+
+load(file=here::here("output","knn_BUCHI_Model.RData"))
+resCV_1[[1]] <- modelFit[[1]]
+load(file=here::here("output","C5.0_BUCHI_Model.RData"))
+resCV_1[[2]] <- modelFit[[1]]
+load(file=here::here("output","xgbLinear_BUCHI_Model.RData"))
+resCV_1[[3]] <- modelFit[[1]]
+load(file=here::here("output","parRF_BUCHI_Model.RData"))
+resCV_1[[4]] <- modelFit[[1]]
+res <- resamples(resCV_1)
+res <- res$values
+resCV_2 <- list()
+
+for(i in 1:4){ 
+  resCV_2[[i]]<-res[,c(paste(paste("Model",i,sep=""),"~Accuracy",sep=""), 
+                       paste(paste("Model",i,sep=""),"~Kappa",sep=""))]
+  resCV_2[[i]]$Model <- modelname[i]
+  colnames(resCV_2[[i]]) <- c("Accuracy","Kappa","Model")}
+
+Results_CV_B <- do.call(rbind,resCV_2)
+Results_CV_B$NIR <- "BUCHI"
+```
+
+```{r,eval=FALSE}
+#save(Results_CV_S,Results_CV_B,file = here::here("output","Results_CrossVal.RData"))
+```
+
+### BOXPlot Cross_validation (all variables)
+```{r}
+load(file = here::here("output","Results_CrossVal.RData"))
+
+Results_CV_B$Model <- as.factor(Results_CV_B$Model)
+Results_CV_S$Model <- as.factor(Results_CV_S$Model)
+levels(Results_CV_B$Model) <- c("CDT","KNN", "RF","XGBL")
+levels(Results_CV_S$Model) <- c("CDT","KNN", "RF","XGBL")
+
+p1<-ggplot(Results_CV_S, aes(x=Model, y=Accuracy, fill=Model)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + ylim(0.7, 1) + 
+  ggtitle("B) SCiO") +
+  theme(legend.position = "none", legend.title =element_blank())+
+  scale_fill_manual(values = c("#999999","orange","#56B4E9","olivedrab3"))
+
+p2<-ggplot(Results_CV_S, aes(x=Model, y=Kappa, fill=Model)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + ylim(0, 1) +
+  ggtitle("D) SCiO") +
+  theme(legend.position = "none", legend.title =element_blank())+
+  scale_fill_manual(values = c("#999999","orange","#56B4E9","olivedrab3"))
+  
+p3<-ggplot(Results_CV_B, aes(x=Model, y=Accuracy, fill=Model)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + ylim(0.7, 1) +
+  ggtitle("A) NIRFlex N-500") +
+  theme(legend.position = "none", legend.title =element_blank())+
+  scale_fill_manual(values = c("#999999","orange","#56B4E9","olivedrab3"))
+
+p4<-ggplot(Results_CV_B, aes(x=Model, y=Kappa, fill=Model)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + ylim(0, 1) +
+  ggtitle("C) NIRFlex N-500") +
+  theme(legend.position = "none", legend.title =element_blank())+
+  scale_fill_manual(values = c("#999999","orange","#56B4E9","olivedrab3"))
+ 
+ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
+```
+
+### save plot Figure 2
+```{r}
+tiff(file = "Figure2_CV_Allvariables.tiff", 
+               width = 16, height=14, res = 700, 
+               compression = "lzw", units = "cm")
+ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
+dev.off()
+```
+
+### Modelos with sel de espectros (scio)
+```{r,eval=FALSE}
+load(file = here::here("output","SCIO_Model_Sel_Var.RData"))
+modelname <- c("KNN","CDT","xgbLinear","parRF")
+
+res <- resamples(list(Model1 = modelFitSEL_S1, Model2 = modelFitSEL_S2,
+                      Model3 = modelFitSEL_S3, Model4 = modelFitSEL_S4))
+
+res <- res$values
+resCV_1 <- list()
+
+for(i in 1:4){ 
+  resCV_1[[i]]<-res[,c(paste(paste("Model",i,sep=""),"~Accuracy",sep=""), 
+                       paste(paste("Model",i,sep=""),"~Kappa",sep=""))]
+  resCV_1[[i]]$Model <- modelname[i]
+  colnames(resCV_1[[i]]) <- c("Accuracy","Kappa","Model")}
+  Results_CV_SEL_S <- do.call(rbind,resCV_1)
+  Results_CV_SEL_S$NIR <- "SCIO"
+
+  
+```
+
+### Modelos with sel de espectros (BUCHI)
+```{r,eval=FALSE}
+load(file = here::here("output","BUCHI_Model_Sel_Var.RData"))
+modelname <- c("KNN","CDT","xgbLinear","parRF")
+
+res <- resamples(list(Model1 = modelFitSEL_S1, Model2 = modelFitSEL_S2,
+                      Model3 = modelFitSEL_S3, Model4 = modelFitSEL_S4))
+
+res <- res$values
+resCV_1 <- list()
+
+for(i in 1:4){ 
+  resCV_1[[i]]<-res[,c(paste(paste("Model",i,sep=""),"~Accuracy",sep=""), 
+                       paste(paste("Model",i,sep=""),"~Kappa",sep=""))]
+  resCV_1[[i]]$Model <- modelname[i]
+  colnames(resCV_1[[i]]) <- c("Accuracy","Kappa","Model")}
+  Results_CV_SEL_B <- do.call(rbind,resCV_1)
+  Results_CV_SEL_B$NIR <- "BUCHI"
+
+#save(Results_CV_SEL_S,Results_CV_SEL_B,
+#  file = here::here("output","Results_CrossVal_SEL.RData"))
+```
+
+### BOXPlot Cross_validation (variables SELECTED)
+```{r}
+load(file = here::here("output","Results_CrossVal_SEL.RData"))
+Results_CV_SEL_S$Model <- as.factor(Results_CV_SEL_S$Model)
+levels(Results_CV_SEL_S$Model) <- c("CDT_Sel","KNN_Sel",
+                                    "RF_Sel","XGBL_Sel")
+
+Results_CV_SEL_B$Model <- as.factor(Results_CV_SEL_B$Model)
+levels(Results_CV_SEL_B$Model) <- c("CDT_Sel","KNN_Sel",
+                                    "RF_Sel","XGBL_Sel")
+
+
+p1<-ggplot(Results_CV_SEL_S, aes(x=Model, y=Accuracy, fill=Model)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + ylim(0.7, 1) + 
+  ggtitle("B) SCiO") +
+  theme(legend.position = "none", legend.title =element_blank())+
+  scale_fill_manual(values = c("#999999","orange","#56B4E9","olivedrab3"))
+
+p2<-ggplot(Results_CV_SEL_S, aes(x=Model, y=Kappa, fill=Model)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + ylim(0, 1) +
+  ggtitle("D) SCiO") +
+  theme(legend.position = "none", legend.title =element_blank())+
+  scale_fill_manual(values = c("#999999","orange","#56B4E9","olivedrab3"))
+  
+p3<-ggplot(Results_CV_SEL_B, aes(x=Model, y=Accuracy, fill=Model)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + ylim(0.7, 1) +
+  ggtitle("A) NIRFlex N-500") +
+  theme(legend.position = "none", legend.title =element_blank())+
+  scale_fill_manual(values = c("#999999","orange","#56B4E9","olivedrab3"))
+
+p4<-ggplot(Results_CV_SEL_B, aes(x=Model, y=Kappa, fill=Model)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + ylim(0, 1) +
+  ggtitle("C) NIRFlex N-500") +
+  theme(legend.position = "none", legend.title =element_blank())+
+  scale_fill_manual(values = c("#999999","orange","#56B4E9","olivedrab3"))
+ 
+ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
+
+```
+
+### save plot Figure 4
+```{r}
+tiff(file = "Figure4_CV_SelVariables.tiff", 
+               width = 16, height=14, res = 700, 
+               compression = "lzw", units = "cm")
+ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
+dev.off()
+```
+
+### Preparar resultados da matriz de confusao (SCIO)
+```{r,eval=F}
+load(file=here::here("output","SCIO_testing_set.RData"))
+load(file=here::here("output","knn_SCIO_Model.RData"))
+M1pred <- predict(modelFit[[1]],newdata = testing[[1]])
+levels(M1pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M1pred1 <- prettyConfused(testing[[1]]$Waxy,M1pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="KNN")
+
+load(file=here::here("output","C5.0_SCIO_Model.RData"))
+M2pred <- predict(modelFit[[1]],newdata = testing[[1]])
+levels(M2pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M2pred1 <- prettyConfused(testing[[1]]$Waxy,M2pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="CDT")
+
+
+load(file=here::here("output","xgbLinear_SCIO_Model.RData"))
+M3pred <- predict(modelFit[[1]],newdata = testing[[1]])
+levels(M3pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M3pred1 <- prettyConfused(testing[[1]]$Waxy,M3pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="XGB")
+
+
+load(file=here::here("output","parRF_SCIO_Model.RData"))
+M4pred <- predict(modelFit[[1]],newdata = testing[[1]])
+levels(M4pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M4pred1 <- prettyConfused(testing[[1]]$Waxy,M4pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="RF")
+ 
+ggarrange(M1pred1,M2pred1,M3pred1,M4pred1,ncol=1,nrow=4)
+
+```
+
+
+### Preparar resultados da matriz de confusao (BUCHI)
+```{r,eval=F}
+load(file=here::here("output","BUCHI_testing_set.RData"))
+load(file=here::here("output","knn_BUCHI_Model.RData"))
+M5pred <- predict(modelFit[[1]],newdata = testing[[1]])
+levels(M5pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M5pred1 <- prettyConfused(testing[[1]]$Waxy,M5pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="KNN")
+
+load(file=here::here("output","C5.0_BUCHI_Model.RData"))
+M6pred <- predict(modelFit[[1]],newdata = testing[[1]])
+levels(M6pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M6pred1 <- prettyConfused(testing[[1]]$Waxy,M6pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="CDT")
+
+
+load(file=here::here("output","xgbLinear_BUCHI_Model.RData"))
+M7pred <- predict(modelFit[[1]],newdata = testing[[1]])
+levels(M7pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M7pred1 <- prettyConfused(testing[[1]]$Waxy,M7pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="XGB")
+
+
+load(file=here::here("output","parRF_BUCHI_Model.RData"))
+M8pred <- predict(modelFit[[1]],newdata = testing[[1]])
+levels(M8pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M8pred1 <- prettyConfused(testing[[1]]$Waxy,M8pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="RF")
+library(ggpubr) 
+ggarrange(M5pred1,M6pred1,M7pred1,M8pred1,ncol=1,nrow=4)
+
+```
+
+
+### Preparar resultados da matriz de confusao (SCIO) Variable Selected
+```{r,eval=F}
+load(file=here::here("output","SCIO_testing_set.RData"))
+load(file=here::here("output","SCIO_Model_Sel_Var.RData"))
+M1pred <- predict(modelFitSEL_S1,newdata = testing[[1]])
+levels(M1pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M1pred1s <- prettyConfused(testing[[1]]$Waxy,M1pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="KNN_Sel")
+
+M2pred <- predict(modelFitSEL_S2,newdata = testing[[1]])
+levels(M2pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M2pred1s <- prettyConfused(testing[[1]]$Waxy,M2pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="CDT_Sel")
+
+M3pred <- predict(modelFitSEL_S3,newdata = testing[[1]])
+levels(M3pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M3pred1s <- prettyConfused(testing[[1]]$Waxy,M3pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="XGB_Sel")
+
+M4pred <- predict(modelFitSEL_S4,newdata = testing[[1]])
+levels(M4pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M4pred1s <- prettyConfused(testing[[1]]$Waxy,M4pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="RF_Sel")
+ 
+ggarrange(M1pred1s,M2pred1s,M3pred1s,M4pred1s,ncol=1,nrow=4)
+
+```
+
+
+### Preparar resultados da matriz de confusao (BUCHI) Variable Selected
+```{r,eval=F}
+load(file=here::here("output","BUCHI_testing_set.RData"))
+load(file=here::here("output","BUCHI_Model_Sel_Var.RData"))
+M5pred <- predict(modelFitSEL_S1,newdata = testing[[1]])
+levels(M5pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M5pred1s <- prettyConfused(testing[[1]]$Waxy,M5pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="KNN_Sel")
+
+M6pred <- predict(modelFitSEL_S2,newdata = testing[[1]])
+levels(M6pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M6pred1s <- prettyConfused(testing[[1]]$Waxy,M6pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="CDT_Sel")
+
+M7pred <- predict(modelFitSEL_S3,newdata = testing[[1]])
+levels(M7pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M7pred1s <- prettyConfused(testing[[1]]$Waxy,M7pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="XGB_Sel")
+
+M8pred <- predict(modelFitSEL_S4,newdata = testing[[1]])
+levels(M8pred) <- c("Nonwaxy","Waxy")
+levels(testing[[1]]$Waxy) <- c("Nonwaxy","Waxy")
+M8pred1s <- prettyConfused(testing[[1]]$Waxy,M8pred,
+                          colors=c("white","red4","dodgerblue3"),
+                          text.scl = 5)+labs(title="RF_Sel")
+library(ggpubr) 
+ggarrange(M5pred1s,M6pred1s,M7pred1s,M8pred1s,ncol=1,nrow=4)
+
+```
+
+### Save and load Confusion Matrix plot
+```{r,eval=FALSE}
+save(M1pred1,M2pred1,M3pred1,M4pred1,M5pred1,M6pred1,M7pred1,M8pred1,
+     M1pred1s,M2pred1s,M3pred1s,M4pred1s,M5pred1s,M6pred1s,M7pred1s,
+     M8pred1s, file = here::here("output","Plot_ConfMatrix.RData"))
+```
+
+### Plot
+```{r}
+load( file = here::here("output","Plot_ConfMatrix.RData"))
+
+library(ggpubr) 
+
+tiff(file = "Figure5_MC_BUCHI.tiff", 
+               width = 20, height=16, res = 700, 
+               compression = "lzw", units = "cm")
+ggarrange(M5pred1,M5pred1s,M6pred1,M6pred1s,M7pred1,
+          M7pred1s,M8pred1,M8pred1s,ncol=2,nrow=4)
+dev.off()
+
+tiff(file = "Figure6_MC_SCIO.tiff", 
+               width = 20, height=16, res = 700, 
+               compression = "lzw", units = "cm")
+ggarrange(M1pred1,M1pred1s,M2pred1,M2pred1s,M3pred1,
+          M3pred1s,M4pred1,M4pred1s,ncol=2,nrow=4)
+dev.off()
+
+```
+
+
+

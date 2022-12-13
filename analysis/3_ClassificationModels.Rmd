@@ -81,19 +81,38 @@ load(file = here::here("output","Results_PreTreat.RData"))
 
 ### plot 
 ```{r}
-
-ggplot(PT_BUCHI, aes(x=PT, y=Accuracy, fill=PT)) + 
-  geom_boxplot()   + theme_bw() + ylim(.8, 1) + ggtitle("BUCHI")
+p1 <- ggplot(PT_BUCHI, aes(x=PT, y=Accuracy, fill=PT)) + theme_bw() + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme(legend.position = "none",axis.title.x=element_blank())+
+  ylim(0.8, 1) + ggtitle("A) NIR BUCHI")
  
-ggplot(PT_BUCHI, aes(x=PT, y=Kappa, fill=PT)) + 
-  geom_boxplot() + theme_bw() + ylim(0, 1) + ggtitle("BUCHI")
+p2<- ggplot(PT_BUCHI, aes(x=PT, y=Kappa, fill=PT)) +theme_bw() + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme(legend.position = "none",axis.title.x=element_blank())+
+  ylim(0, 1) + ggtitle("A) NIR BUCHI")
 
-ggplot(PT_SCIO, aes(x=PT, y=Accuracy, fill=PT)) + 
-  geom_boxplot()   + theme_bw() + ylim(.8, 1) + ggtitle("SCIO")
+p3<- ggplot(PT_SCIO, aes(x=PT, y=Accuracy, fill=PT)) + theme_bw() + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme(legend.position = "none",axis.title.x=element_blank())+
+  ylim(.8, 1) + ggtitle("B) NIR SCIO")
  
-ggplot(PT_SCIO, aes(x=PT, y=Kappa, fill=PT)) + 
-  geom_boxplot() + theme_bw() + ylim(0, 1) + ggtitle("SCIO")
+p4<- ggplot(PT_SCIO, aes(x=PT, y=Kappa, fill=PT)) + theme_bw() + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme(legend.position = "none",axis.title.x=element_blank())+
+  ylim(0, 1) + ggtitle("B) NIR SCIO")
 
+
+tiff(file = "Figure1_PT_methods_Acc.tiff", 
+               width = 19, height=12, res = 700, 
+               compression = "lzw", units = "cm")
+ggarrange(p1,p3,ncol=1,nrow=2)
+dev.off()
+
+tiff(file = "Figure1_PT_methods_Kap.tiff", 
+               width = 19, height=12, res = 700, 
+               compression = "lzw", units = "cm")
+ggarrange(p2,p4,ncol=1,nrow=4)
+dev.off()
 ```
 
 ### table BUCHI
