@@ -56,8 +56,8 @@ pCM <- list()
   training <- list()
   testing <- list()
   CM <- list()
-
-for (i in 1:5) {
+i=1
+#for (i in 1:5) {
    set.seed(i)
     index[[i]] <- createDataPartition(dados1[,"Waxy"], p = .8, list = FALSE)
     training[[i]] <- dados1[index[[i]], ]
@@ -71,7 +71,7 @@ for (i in 1:5) {
     
     modelPredict <- predict(modelFit[[i]],newdata = testing[[i]])
     CM[[i]] <- confusionMatrix(modelPredict, testing[[i]]$Waxy)
-}
+#}
  # modelFit2[[j]] <- modelFit
  #  pCM[[j]] <- CM 
   #}

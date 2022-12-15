@@ -48,15 +48,27 @@ library(caret)
 ```{r,eval=F}
 resCV_1 <- list()
 modelname <- c("KNN","CDT","xgbLinear","parRF")
+ResCM <- matrix(NA,ncol=6,nrow = 16)
 
 load(file=here::here("output","knn_SCIO_Model.RData"))
 resCV_1[[1]] <- modelFit[[1]]
+ResCM[1,1:2] <- CM[[1]]$overall[c(1,2)]
+ResCM[1,3:4] <- CM[[1]]$byClass[c(1,2)]
+
 load(file=here::here("output","C5.0_SCIO_Model.RData"))
 resCV_1[[2]] <- modelFit[[1]]
+ResCM[2,1:2] <- CM[[1]]$overall[c(1,2)]
+ResCM[2,3:4] <- CM[[1]]$byClass[c(1,2)]
+
 load(file=here::here("output","xgbLinear_SCIO_Model.RData"))
 resCV_1[[3]] <- modelFit[[1]]
+ResCM[3,1:2] <- CM[[1]]$overall[c(1,2)]
+ResCM[3,3:4] <- CM[[1]]$byClass[c(1,2)]
+
 load(file=here::here("output","parRF_SCIO_Model.RData"))
 resCV_1[[4]] <- modelFit[[1]]
+ResCM[4,1:2] <- CM[[1]]$overall[c(1,2)]
+ResCM[4,3:4] <- CM[[1]]$byClass[c(1,2)]
 
 res <- resamples(resCV_1)
 res <- res$values
@@ -135,6 +147,7 @@ p4<-ggplot(Results_CV_B, aes(x=Model, y=Kappa, fill=Model)) +
   theme(legend.position = "none", legend.title =element_blank())+
   scale_fill_manual(values = c("#999999","orange","#56B4E9","olivedrab3"))
  
+library(ggpubr)
 ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
 ```
 
@@ -241,6 +254,20 @@ ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
 dev.off()
 ```
 
+### Table All variables BUCHI
+```{r}
+library(dplyr)
+library(gt)
+
+Res <- rbind(Results_CV_B,Results_CV_S,Results_CV_SEL_B,Results_CV_SEL_S)
+
+Res%>%group_by(NIR,Model)%>%
+   summarise(Acc = round(mean(Accuracy, na.rm = T),3),
+             Kap = round(mean(Kappa, na.rm = T),3)) %>%
+       gt()  %>%     tab_options(table.font.size = pct(75))
+```
+
+
 ### Preparar resultados da matriz de confusao (SCIO)
 ```{r,eval=F}
 load(file=here::here("output","SCIO_testing_set.RData"))
@@ -281,6 +308,8 @@ M4pred1 <- prettyConfused(testing[[1]]$Waxy,M4pred,
 ggarrange(M1pred1,M2pred1,M3pred1,M4pred1,ncol=1,nrow=4)
 
 ```
+
+
 
 
 ### Preparar resultados da matriz de confusao (BUCHI)
