@@ -90,12 +90,24 @@ resCV_1 <- list()
 
 load(file=here::here("output","knn_BUCHI_Model.RData"))
 resCV_1[[1]] <- modelFit[[1]]
+ResCM[9,1:2] <- CM[[1]]$overall[c(1,2)]
+ResCM[9,3:4] <- CM[[1]]$byClass[c(1,2)]
+
 load(file=here::here("output","C5.0_BUCHI_Model.RData"))
 resCV_1[[2]] <- modelFit[[1]]
+ResCM[10,1:2] <- CM[[1]]$overall[c(1,2)]
+ResCM[10,3:4] <- CM[[1]]$byClass[c(1,2)]
+
 load(file=here::here("output","xgbLinear_BUCHI_Model.RData"))
 resCV_1[[3]] <- modelFit[[1]]
+ResCM[11,1:2] <- CM[[1]]$overall[c(1,2)]
+ResCM[11,3:4] <- CM[[1]]$byClass[c(1,2)]
+
 load(file=here::here("output","parRF_BUCHI_Model.RData"))
 resCV_1[[4]] <- modelFit[[1]]
+ResCM[12,1:2] <- CM[[1]]$overall[c(1,2)]
+ResCM[12,3:4] <- CM[[1]]$byClass[c(1,2)]
+
 res <- resamples(resCV_1)
 res <- res$values
 resCV_2 <- list()
@@ -163,7 +175,26 @@ dev.off()
 ### Modelos with sel de espectros (scio)
 ```{r,eval=FALSE}
 load(file = here::here("output","SCIO_Model_Sel_Var.RData"))
+load(file = here::here("output","SCIO_testing_set.RData"))
+
 modelname <- c("KNN","CDT","xgbLinear","parRF")
+
+modelPredict <- predict(modelFitSEL_S1,newdata = testing[[1]])
+    CM <- confusionMatrix(modelPredict, testing[[1]]$Waxy)
+    ResCM[5,1:2] <- CM$overall[c(1,2)]
+    ResCM[5,3:4] <- CM$byClass[c(1,2)]
+modelPredict <- predict(modelFitSEL_S2,newdata = testing[[1]])
+    CM <- confusionMatrix(modelPredict, testing[[1]]$Waxy)
+    ResCM[6,1:2] <- CM$overall[c(1,2)]
+    ResCM[6,3:4] <- CM$byClass[c(1,2)]
+modelPredict <- predict(modelFitSEL_S3,newdata = testing[[1]])
+    CM <- confusionMatrix(modelPredict, testing[[1]]$Waxy)
+    ResCM[7,1:2] <- CM$overall[c(1,2)]
+    ResCM[7,3:4] <- CM$byClass[c(1,2)]
+modelPredict <- predict(modelFitSEL_S4,newdata = testing[[1]])
+    CM <- confusionMatrix(modelPredict, testing[[1]]$Waxy)
+    ResCM[8,1:2] <- CM$overall[c(1,2)]
+    ResCM[8,3:4] <- CM$byClass[c(1,2)]
 
 res <- resamples(list(Model1 = modelFitSEL_S1, Model2 = modelFitSEL_S2,
                       Model3 = modelFitSEL_S3, Model4 = modelFitSEL_S4))
@@ -185,7 +216,26 @@ for(i in 1:4){
 ### Modelos with sel de espectros (BUCHI)
 ```{r,eval=FALSE}
 load(file = here::here("output","BUCHI_Model_Sel_Var.RData"))
+load(file = here::here("output","BUCHI_testing_set.RData"))
 modelname <- c("KNN","CDT","xgbLinear","parRF")
+
+modelPredict <- predict(modelFitSEL_S1,newdata = testing[[1]])
+    CM <- confusionMatrix(modelPredict, testing[[1]]$Waxy)
+    ResCM[13,1:2] <- CM$overall[c(1,2)]
+    ResCM[13,3:4] <- CM$byClass[c(1,2)]
+modelPredict <- predict(modelFitSEL_S2,newdata = testing[[1]])
+    CM <- confusionMatrix(modelPredict, testing[[1]]$Waxy)
+    ResCM[14,1:2] <- CM$overall[c(1,2)]
+    ResCM[14,3:4] <- CM$byClass[c(1,2)]
+modelPredict <- predict(modelFitSEL_S3,newdata = testing[[1]])
+    CM <- confusionMatrix(modelPredict, testing[[1]]$Waxy)
+    ResCM[15,1:2] <- CM$overall[c(1,2)]
+    ResCM[15,3:4] <- CM$byClass[c(1,2)]
+modelPredict <- predict(modelFitSEL_S4,newdata = testing[[1]])
+    CM <- confusionMatrix(modelPredict, testing[[1]]$Waxy)
+    ResCM[16,1:2] <- CM$overall[c(1,2)]
+    ResCM[16,3:4] <- CM$byClass[c(1,2)]
+
 
 res <- resamples(list(Model1 = modelFitSEL_S1, Model2 = modelFitSEL_S2,
                       Model3 = modelFitSEL_S3, Model4 = modelFitSEL_S4))
@@ -204,6 +254,21 @@ for(i in 1:4){
 #save(Results_CV_SEL_S,Results_CV_SEL_B,
 #  file = here::here("output","Results_CrossVal_SEL.RData"))
 ```
+
+### PLOT Confusion matrix parametros
+```{r}
+ResCM  
+colnames(ResCM) <- c("acc","kappa","Sensitivity","Specificity","Model","NIR")
+ResCM <- as.data.frame(ResCM)
+ResCM[,5] <- modelname
+ResCM$acc <- round(as.numeric(ResCM$acc),2)
+ResCM$kappa <- round(as.numeric(ResCM$kappa),2)
+ResCM$Sensitivity <- round(as.numeric(ResCM$Sensitivity),2)
+ResCM$Specificity <- round(as.numeric(ResCM$Specificity),2)
+ResCM$NIR <- rep(c("SCIO","SCIO_SEL","BUCHI","BUCHI_SEL"),each=4)
+ResCM %>% gt()
+```
+
 
 ### BOXPlot Cross_validation (variables SELECTED)
 ```{r}
