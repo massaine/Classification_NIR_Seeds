@@ -378,7 +378,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-12-02
+<strong>Last updated:</strong> 2022-12-13
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
@@ -469,16 +469,16 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommassaineClassificationNIRSeedstree780f846fb37a59a1e649aa71112974d56999cc30targetblank780f846a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/massaine/Classification_NIR_Seeds/tree/780f846fb37a59a1e649aa71112974d56999cc30" target="_blank">780f846</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommassaineClassificationNIRSeedstree012d6476dd68266fa3168eb573826c0e4ee9210atargetblank012d647a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/massaine/Classification_NIR_Seeds/tree/012d6476dd68266fa3168eb573826c0e4ee9210a" target="_blank">012d647</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommassaineClassificationNIRSeedstree780f846fb37a59a1e649aa71112974d56999cc30targetblank780f846a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommassaineClassificationNIRSeedstree012d6476dd68266fa3168eb573826c0e4ee9210atargetblank012d647a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/massaine/Classification_NIR_Seeds/tree/780f846fb37a59a1e649aa71112974d56999cc30" target="_blank">780f846</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/massaine/Classification_NIR_Seeds/tree/012d6476dd68266fa3168eb573826c0e4ee9210a" target="_blank">012d647</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -487,29 +487,49 @@ Note that you need to be careful to ensure that all relevant files for the analy
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    Figure1_PT_methods.tiff
+    Ignored:    Figure1_PT_methods_Acc.tiff
+    Ignored:    Figure1_PT_methods_Kap.tiff
+    Ignored:    Figure2_CV_Allvariables.tiff
+    Ignored:    Figure3_SelVariables.tiff
+    Ignored:    Figure4_CV_SelVariables.tiff
+    Ignored:    Figure5_MC_BUCHI.tiff
+    Ignored:    Figure6_MC_SCIO.tiff
+    Ignored:    Table 1 BUCHI.html
+    Ignored:    Table 2 SCIO.html
+    Ignored:    analysis/Figure1_PT_methods_Acc.tiff
+    Ignored:    boxplot_CV_temp.png
     Ignored:    data/DadosNIR_fen_BUCCHI_Seeds_2019.txt
     Ignored:    data/DadosNIR_fen_SCIO_Seeds_2019.txt
     Ignored:    data/numeracaoondasbucchi.txt
+    Ignored:    output/C5.0_SCIO_Model.RData
     Ignored:    output/Data_BUCHI.RData
     Ignored:    output/Data_SCIO.RData
     Ignored:    output/Results_PreTreat.RData
     Ignored:    output/dadosBUCHI_PT.RData
     Ignored:    output/dadosSCIO_PT.RData
+    Ignored:    output/knn_BUCHI_Model.RData
     Ignored:    output/knn_SCIO_Model.RData
+    Ignored:    output/xgbLinear_BUCHI_Model.RData
 
 Untracked files:
-    Untracked:  analysis/4.4_RF_SCIO_ClassificationModels.Rmd
-    Untracked:  analysis/5.2_CDT_BUCHI_ClassificationModels.Rmd
-    Untracked:  analysis/5.3_XGB_BUCHI_ClassificationModels.Rmd
-    Untracked:  analysis/5.4_RF_BUCHI_ClassificationModels.Rmd
     Untracked:  data/.gitignore
     Untracked:  output/.gitignore
-    Untracked:  output/C5.0_SCIO_Model.RData
-    Untracked:  output/knn_BUCHI_Model.RData
+    Untracked:  output/BUCHI_Model_Sel_Var.RData
+    Untracked:  output/BUCHI_testing_set.RData
+    Untracked:  output/C5.0_BUCHI_Model.RData
+    Untracked:  output/Plot_ConfMatrix.RData
+    Untracked:  output/Results_CrossVal.RData
+    Untracked:  output/Results_CrossVal_SEL.RData
+    Untracked:  output/SCIO_Model_Sel_Var.RData
+    Untracked:  output/SCIO_testing_set.RData
+    Untracked:  output/parRF_BUCHI_Model.RData
+    Untracked:  output/parRF_SCIO_Model.RData
+    Untracked:  output/xgbLinear_SCIO_Model.RData
 
 Unstaged changes:
+    Modified:   .gitignore
     Modified:   analysis/3_ClassificationModels.Rmd
-    Modified:   analysis/5.1_KNN_BUCHI_ClassificationModels.Rmd
 
 </code></pre>
 <p>
@@ -548,6 +568,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/massaine/Classification_NIR_Seeds/blob/012d6476dd68266fa3168eb573826c0e4ee9210a/analysis/3_ClassificationModels.Rmd" target="_blank">012d647</a>
+</td>
+<td>
+massaine
+</td>
+<td>
+2022-12-13
+</td>
+<td>
+Update script
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/massaine/Classification_NIR_Seeds/4c71bc47e24e45b99d687abfb57197af46790d38/docs/3_ClassificationModels.html" target="_blank">4c71bc4</a>
+</td>
+<td>
+massaine
+</td>
+<td>
+2022-12-03
+</td>
+<td>
+update docs
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/massaine/Classification_NIR_Seeds/blob/6b12b911260b851a31200c2df5d09b311afeb704/analysis/3_ClassificationModels.Rmd" target="_blank">6b12b91</a>
+</td>
+<td>
+massaine
+</td>
+<td>
+2022-12-03
+</td>
+<td>
+update script 2
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -627,6 +698,8 @@ Attaching package: &#39;dplyr&#39;</code></pre>
     intersect, setdiff, setequal, union</code></pre>
 <pre class="r"><code>library(gt)</code></pre>
 <pre><code>Warning: package &#39;gt&#39; was built under R version 4.1.3</code></pre>
+<pre class="r"><code>library(ggpubr) </code></pre>
+<pre><code>Warning: package &#39;ggpubr&#39; was built under R version 4.1.3</code></pre>
 <pre class="r"><code>NIR &lt;- &quot;SCIO&quot;
 load(file=here::here(&quot;output&quot;,&quot;dadosSCIO_PT.RData&quot;))
 
@@ -678,20 +751,43 @@ load(file = here::here(&quot;output&quot;,&quot;Results_PreTreat.RData&quot;))</
 </div>
 <div id="plot" class="section level3">
 <h3>plot</h3>
-<pre class="r"><code>ggplot(PT_BUCHI, aes(x=PT, y=Accuracy, fill=PT)) + 
-  geom_boxplot()   + theme_bw() + ylim(.8, 1) + ggtitle(&quot;BUCHI&quot;)</code></pre>
-<p><img src="figure/3_ClassificationModels.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ggplot(PT_BUCHI, aes(x=PT, y=Kappa, fill=PT)) + 
-  geom_boxplot() + theme_bw() + ylim(0, 1) + ggtitle(&quot;BUCHI&quot;)</code></pre>
-<p><img src="figure/3_ClassificationModels.Rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ggplot(PT_SCIO, aes(x=PT, y=Accuracy, fill=PT)) + 
-  geom_boxplot()   + theme_bw() + ylim(.8, 1) + ggtitle(&quot;SCIO&quot;)</code></pre>
+<pre class="r"><code>p1 &lt;- ggplot(PT_BUCHI, aes(x=PT, y=Accuracy, fill=PT)) + theme_bw() + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme(legend.position = &quot;none&quot;,axis.title.x=element_blank())+
+  ylim(0.8, 1) + ggtitle(&quot;A) NIR BUCHI&quot;)
+ 
+p2&lt;- ggplot(PT_BUCHI, aes(x=PT, y=Kappa, fill=PT)) +theme_bw() + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme(legend.position = &quot;none&quot;,axis.title.x=element_blank())+
+  ylim(0, 1) + ggtitle(&quot;A) NIR BUCHI&quot;)
+
+p3&lt;- ggplot(PT_SCIO, aes(x=PT, y=Accuracy, fill=PT)) + theme_bw() + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme(legend.position = &quot;none&quot;,axis.title.x=element_blank())+
+  ylim(.8, 1) + ggtitle(&quot;B) NIR SCIO&quot;)
+ 
+p4&lt;- ggplot(PT_SCIO, aes(x=PT, y=Kappa, fill=PT)) + theme_bw() + 
+  geom_boxplot(outlier.shape = NA) + 
+  theme(legend.position = &quot;none&quot;,axis.title.x=element_blank())+
+  ylim(0, 1) + ggtitle(&quot;B) NIR SCIO&quot;)
+
+
+tiff(file = &quot;Figure1_PT_methods_Acc.tiff&quot;, 
+               width = 19, height=12, res = 700, 
+               compression = &quot;lzw&quot;, units = &quot;cm&quot;)
+ggarrange(p1,p3,ncol=1,nrow=2)</code></pre>
 <pre><code>Warning: Removed 1 rows containing non-finite values (stat_boxplot).</code></pre>
-<p><img src="figure/3_ClassificationModels.Rmd/unnamed-chunk-7-3.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>ggplot(PT_SCIO, aes(x=PT, y=Kappa, fill=PT)) + 
-  geom_boxplot() + theme_bw() + ylim(0, 1) + ggtitle(&quot;SCIO&quot;)</code></pre>
+<pre class="r"><code>dev.off()</code></pre>
+<pre><code>png 
+  2 </code></pre>
+<pre class="r"><code>tiff(file = &quot;Figure1_PT_methods_Kap.tiff&quot;, 
+               width = 19, height=12, res = 700, 
+               compression = &quot;lzw&quot;, units = &quot;cm&quot;)
+ggarrange(p2,p4,ncol=1,nrow=4)</code></pre>
 <pre><code>Warning: Removed 30 rows containing non-finite values (stat_boxplot).</code></pre>
-<p><img src="figure/3_ClassificationModels.Rmd/unnamed-chunk-7-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>dev.off()</code></pre>
+<pre><code>png 
+  2 </code></pre>
 </div>
 <div id="table-buchi" class="section level3">
 <h3>table BUCHI</h3>
@@ -1681,42 +1777,45 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] gt_0.6.0        dplyr_1.0.9     stringr_1.4.1   C50_0.1.6      
- [5] pROC_1.18.0     mlbench_2.1-3   caret_6.0-92    lattice_0.20-44
- [9] ggplot2_3.3.6   prospectr_0.2.4
+ [1] ggpubr_0.4.0    gt_0.6.0        dplyr_1.0.9     stringr_1.4.1  
+ [5] C50_0.1.6       pROC_1.18.0     mlbench_2.1-3   caret_6.0-92   
+ [9] lattice_0.20-44 ggplot2_3.3.6   prospectr_0.2.4
 
 loaded via a namespace (and not attached):
- [1] nlme_3.1-152         fs_1.5.2             lubridate_1.8.0     
- [4] rprojroot_2.0.3      backports_1.4.1      tools_4.1.1         
- [7] bslib_0.3.1          utf8_1.2.2           R6_2.5.1            
-[10] rpart_4.1-15         DBI_1.1.2            colorspace_2.0-3    
-[13] nnet_7.3-16          withr_2.5.0          tidyselect_1.1.2    
-[16] compiler_4.1.1       git2r_0.30.1         cli_3.3.0           
-[19] Cubist_0.4.0         labeling_0.4.2       sass_0.4.1          
-[22] checkmate_2.1.0      scales_1.2.0         mvtnorm_1.1-3       
-[25] digest_0.6.29        rmarkdown_2.18       pkgconfig_2.0.3     
-[28] htmltools_0.5.2      parallelly_1.32.0    highr_0.9           
-[31] fastmap_1.1.0        rlang_1.0.2          rstudioapi_0.13     
-[34] farver_2.1.0         jquerylib_0.1.4      generics_0.1.2      
-[37] jsonlite_1.8.0       ModelMetrics_1.2.2.2 magrittr_2.0.3      
-[40] Formula_1.2-4        Matrix_1.3-4         Rcpp_1.0.8.3        
-[43] munsell_0.5.0        fansi_1.0.3          partykit_1.2-15     
-[46] lifecycle_1.0.1      stringi_1.7.6        whisker_0.4         
-[49] yaml_2.3.5           inum_1.0-4           mathjaxr_1.6-0      
-[52] MASS_7.3-54          plyr_1.8.7           recipes_0.2.0       
-[55] grid_4.1.1           parallel_4.1.1       listenv_0.8.0       
-[58] promises_1.2.0.1     crayon_1.5.1         splines_4.1.1       
-[61] knitr_1.41           pillar_1.7.0         future.apply_1.9.0  
-[64] reshape2_1.4.4       codetools_0.2-18     stats4_4.1.1        
-[67] glue_1.6.2           evaluate_0.15        data.table_1.14.2   
-[70] vctrs_0.4.1          httpuv_1.6.5         foreach_1.5.2       
-[73] gtable_0.3.0         purrr_0.3.4          future_1.26.1       
-[76] assertthat_0.2.1     xfun_0.35            gower_1.0.0         
-[79] prodlim_2019.11.13   libcoin_1.0-9        later_1.3.0         
-[82] class_7.3-19         survival_3.2-11      timeDate_3043.102   
-[85] tibble_3.1.7         iterators_1.0.14     hardhat_1.0.0       
-[88] workflowr_1.7.0      lava_1.6.10          globals_0.15.1      
-[91] ellipsis_0.3.2       ipred_0.9-13         here_1.0.1          </code></pre>
+  [1] nlme_3.1-152         fs_1.5.2             lubridate_1.8.0     
+  [4] rprojroot_2.0.3      backports_1.4.1      tools_4.1.1         
+  [7] bslib_0.3.1          utf8_1.2.2           R6_2.5.1            
+ [10] rpart_4.1-15         DBI_1.1.2            colorspace_2.0-3    
+ [13] nnet_7.3-16          withr_2.5.0          tidyselect_1.1.2    
+ [16] compiler_4.1.1       git2r_0.30.1         cli_3.3.0           
+ [19] Cubist_0.4.0         labeling_0.4.2       sass_0.4.1          
+ [22] checkmate_2.1.0      scales_1.2.0         mvtnorm_1.1-3       
+ [25] digest_0.6.29        rmarkdown_2.18       pkgconfig_2.0.3     
+ [28] htmltools_0.5.2      parallelly_1.32.0    fastmap_1.1.0       
+ [31] rlang_1.0.2          rstudioapi_0.13      farver_2.1.0        
+ [34] jquerylib_0.1.4      generics_0.1.2       jsonlite_1.8.0      
+ [37] car_3.0-13           ModelMetrics_1.2.2.2 magrittr_2.0.3      
+ [40] Formula_1.2-4        Matrix_1.3-4         Rcpp_1.0.8.3        
+ [43] munsell_0.5.0        fansi_1.0.3          abind_1.4-5         
+ [46] partykit_1.2-15      lifecycle_1.0.1      stringi_1.7.6       
+ [49] whisker_0.4          yaml_2.3.5           carData_3.0-5       
+ [52] inum_1.0-4           mathjaxr_1.6-0       MASS_7.3-54         
+ [55] plyr_1.8.7           recipes_0.2.0        grid_4.1.1          
+ [58] parallel_4.1.1       listenv_0.8.0        promises_1.2.0.1    
+ [61] crayon_1.5.1         cowplot_1.1.1        splines_4.1.1       
+ [64] knitr_1.41           pillar_1.7.0         ggsignif_0.6.3      
+ [67] future.apply_1.9.0   reshape2_1.4.4       codetools_0.2-18    
+ [70] stats4_4.1.1         glue_1.6.2           evaluate_0.15       
+ [73] data.table_1.14.2    vctrs_0.4.1          httpuv_1.6.5        
+ [76] foreach_1.5.2        tidyr_1.2.0          gtable_0.3.0        
+ [79] purrr_0.3.4          future_1.26.1        assertthat_0.2.1    
+ [82] xfun_0.35            gower_1.0.0          prodlim_2019.11.13  
+ [85] broom_0.8.0          libcoin_1.0-9        rstatix_0.7.0       
+ [88] later_1.3.0          class_7.3-19         survival_3.2-11     
+ [91] timeDate_3043.102    tibble_3.1.7         iterators_1.0.14    
+ [94] hardhat_1.0.0        workflowr_1.7.0      lava_1.6.10         
+ [97] globals_0.15.1       ellipsis_0.3.2       here_1.0.1          
+[100] ipred_0.9-13        </code></pre>
 </div>
 </div>
 </div>

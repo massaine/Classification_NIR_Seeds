@@ -35,6 +35,8 @@ for(i in 1:length(geno)){
   results[[i]] <- data[[i]][which(as.logical((sd.mean-cutoff<full.sd$SD)*(full.sd$SD<sd.mean+cutoff))), ]}
 dados_semOut <- do.call(rbind,results)  
 table(dados_semOut$Waxy)
+
+dadosBU_S <- dados_semOut[,1:72]
 ```
 
 ### Save data
@@ -71,6 +73,12 @@ for(i in 1:length(geno)){
 
 dados_semOut <- do.call(rbind,results)  
 table(dados_semOut$Waxy)
+
+dadosSC_B <- dados_semOut[,262:332]
+dadosBU_S <- dadosBU_S[,2:72]
+
+mean(dadosSC_B[,1])
+mean(dadosBU_S[,1])
 ```
 
 ### Save data

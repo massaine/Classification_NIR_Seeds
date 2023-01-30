@@ -165,7 +165,7 @@ ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
 
 ### save plot Figure 2
 ```{r}
-tiff(file = "Figure2_CV_Allvariables.tiff", 
+tiff(file = "Figure_1_CV_Allvariables.tiff", 
                width = 16, height=14, res = 700, 
                compression = "lzw", units = "cm")
 ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
@@ -312,7 +312,7 @@ ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
 
 ### save plot Figure 4
 ```{r}
-tiff(file = "Figure4_CV_SelVariables.tiff", 
+tiff(file = "Figure3_CV_SelVariables.tiff", 
                width = 16, height=14, res = 700, 
                compression = "lzw", units = "cm")
 ggarrange(p3,p1,p4,p2,ncol=2,nrow=2)
